@@ -1,0 +1,16 @@
+{
+  "name": "ciphertalk",
+  "version": "1.0.0",
+  "description": "End-to-end encrypted P2P chat using ECDHE + AES-256-GCM + RSA-PSS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
