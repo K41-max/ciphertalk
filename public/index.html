@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CipherTalk v2</title>
+<title>CipherTalk v3</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@600;700;800&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -14,6 +14,7 @@
   --amber:#fbbf24;--amber-g:rgba(251,191,36,.14);
   --rose:#fb7185;--rose-g:rgba(251,113,133,.14);
   --purple:#a78bfa;--purple-g:rgba(167,139,250,.14);
+  --green:#4ade80;--green-g:rgba(74,222,128,.14);
   --text:#cdd9e9;--muted:#4e6580;--muted2:#7a96b2;
   --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;--jp:'Noto Sans JP',sans-serif;
 }
@@ -21,149 +22,179 @@
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--text);font-family:var(--jp);display:flex;flex-direction:column}
 body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:9000}
-header{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--border);background:rgba(13,17,23,.96);backdrop-filter:blur(16px);flex-shrink:0;position:relative;z-index:100}
+
+/* HEADER */
+header{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--border);background:rgba(13,17,23,.96);backdrop-filter:blur(16px);flex-shrink:0;z-index:100}
 .logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:17px;font-weight:800;color:#fff}
 .logo-gem{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 16px var(--teal-gl)}
 .logo em{color:var(--teal);font-style:normal}
-.hbar{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:11px;color:var(--muted)}
-.sdot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:.3s;display:inline-block}
+.hbar{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:.3s;display:inline-block;flex-shrink:0}
 .sdot.live{background:var(--teal);box-shadow:0 0 8px var(--teal-gl);animation:blink 2.2s infinite}
 .sdot.dead{background:var(--rose)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
-#hbar-enc{color:var(--muted)}
+#hbar-enc{color:var(--muted);transition:.3s}
 #hbar-enc.on{color:var(--teal)}
+
+/* LAYOUT */
 .app{display:flex;flex:1;overflow:hidden}
-.sidebar{width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--s1);flex-shrink:0;overflow:hidden}
-.sb-sec{padding:14px 16px;border-bottom:1px solid var(--border)}
-.sb-lbl{font-family:var(--mono);font-size:9px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
-#room-display{font-family:var(--mono);font-size:12px;color:var(--muted2);word-break:break-all}
+
+/* SIDEBAR */
+.sidebar{width:260px;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--s1);flex-shrink:0;overflow:hidden}
+.sb-sec{padding:12px 14px;border-bottom:1px solid var(--border)}
+.sb-lbl{font-family:var(--mono);font-size:9px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+#room-disp{font-family:var(--mono);font-size:11px;color:var(--muted2);word-break:break-all}
+
+/* Members list */
+.members-list{display:flex;flex-direction:column;gap:6px}
+.member-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border)}
+.member-ava{width:26px;height:26px;border-radius:6px;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-weight:700;font-size:11px;flex-shrink:0}
+.member-info{flex:1;min-width:0}
+.member-name{font-family:var(--mono);font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-sub{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:1px}
+.member-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.member-row.me .member-ava{background:var(--teal-g);border-color:rgba(56,217,192,.3);color:var(--teal)}
+
+/* Chips */
 .chip{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;border:1px solid;margin:2px;letter-spacing:.5px}
 .ct{color:var(--teal);border-color:rgba(56,217,192,.25);background:var(--teal-g)}
 .cb{color:var(--blue);border-color:rgba(99,179,255,.25);background:var(--blue-g)}
 .ca{color:var(--amber);border-color:rgba(251,191,36,.25);background:var(--amber-g)}
 .cp{color:var(--purple);border-color:rgba(167,139,250,.25);background:var(--purple-g)}
-.cscroll{flex:1;overflow-y:auto;padding:14px 16px}
+
+/* Crypto cards */
+.cscroll{flex:1;overflow-y:auto;padding:12px 14px}
 .cscroll::-webkit-scrollbar{width:3px}
 .cscroll::-webkit-scrollbar-thumb{background:var(--border2)}
-.ccard{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;transition:border-color .25s}
+.ccard{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;transition:border-color .25s}
 .ccard.ok{border-color:rgba(56,217,192,.3)}
-.chead{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.chead{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
 .calgo{flex:1;color:var(--teal)}
-.cchk{color:var(--muted);font-size:11px}
+.cchk{color:var(--muted);font-size:10px}
 .cchk.ok{color:var(--teal)}
-.cbody{font-family:var(--mono);font-size:10px;color:var(--muted2);line-height:1.7;word-break:break-all}
-.dim{color:var(--muted);font-size:9px}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sc{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px}
-.sn{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
-.sl{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px}
-.leave-btn{width:100%;font-family:var(--mono);font-size:11px;letter-spacing:1px;padding:8px;border-radius:6px;background:var(--rose-g);border:1px solid rgba(251,113,133,.25);color:var(--rose);cursor:pointer;transition:.2s}
+.cbody{font-family:var(--mono);font-size:9px;color:var(--muted2);line-height:1.65;word-break:break-all}
+.dim{color:var(--muted);font-size:8px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.sc{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px}
+.sn{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)}
+.sl{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:1px}
+.leave-btn{width:100%;font-family:var(--mono);font-size:11px;padding:7px;border-radius:6px;background:var(--rose-g);border:1px solid rgba(251,113,133,.25);color:var(--rose);cursor:pointer;transition:.2s}
 .leave-btn:hover{background:rgba(251,113,133,.25)}
+
+/* CHAT */
 .chat-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.chat-head{padding:11px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--s1);flex-shrink:0}
-.pava{width:34px;height:34px;border-radius:8px;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:14px;font-family:var(--sans);font-weight:700}
-.pname{font-family:var(--sans);font-size:14px;font-weight:700;color:#fff}
-.psub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:1px}
-#e2e-pill{display:none;font-family:var(--mono);font-size:9px;letter-spacing:1px;padding:4px 10px;border-radius:5px;background:var(--teal-g);border:1px solid rgba(56,217,192,.2);color:var(--teal)}
-.msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+.chat-head{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--s1);flex-shrink:0}
+.room-title{font-family:var(--sans);font-size:14px;font-weight:700;color:#fff}
+.room-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:1px}
+#e2e-pill{display:none;font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:5px;background:var(--teal-g);border:1px solid rgba(56,217,192,.2);color:var(--teal)}
+#wait-pill{font-family:var(--mono);font-size:9px;padding:4px 10px;border-radius:5px;background:var(--amber-g);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+
+/* Messages */
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
 .msgs::-webkit-scrollbar{width:4px}
 .msgs::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);text-align:center}
-.ei{font-size:44px;opacity:.25}
+.ei{font-size:40px;opacity:.25}
 .empty p{font-size:13px;line-height:1.7;max-width:260px}
 .ehint{font-family:var(--mono);font-size:10px;padding:7px 14px;border:1px solid var(--border2);border-radius:5px;color:var(--muted2)}
-.mrow{display:flex;flex-direction:column;max-width:75%;animation:su .2s ease}
-@keyframes su{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+.mrow{display:flex;flex-direction:column;max-width:72%;animation:su .2s ease}
+@keyframes su{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .mrow.me{align-self:flex-end;align-items:flex-end}
-.mrow.peer{align-self:flex-start;align-items:flex-start}
-.mrow.sys{align-self:center;align-items:center;max-width:88%}
-.bubble{padding:9px 14px;border-radius:12px;font-size:13.5px;line-height:1.55;word-break:break-word}
-.mrow.me .bubble{background:var(--teal-g);border:1px solid rgba(56,217,192,.2);border-bottom-right-radius:3px;color:#d4fff8}
-.mrow.peer .bubble{background:var(--s2);border:1px solid var(--border2);border-bottom-left-radius:3px}
-.mrow.sys .bubble{background:transparent;border:1px solid var(--border);border-radius:7px;font-family:var(--mono);font-size:10px;color:var(--muted2);padding:5px 14px}
+.mrow.other{align-self:flex-start;align-items:flex-start}
+.mrow.sys{align-self:center;align-items:center;max-width:90%}
+.msender{font-family:var(--mono);font-size:9px;color:var(--muted2);margin-bottom:3px;padding:0 4px}
+.bubble{padding:9px 13px;border-radius:12px;font-size:13.5px;line-height:1.55;word-break:break-word}
+.mrow.me   .bubble{background:var(--teal-g);border:1px solid rgba(56,217,192,.2);border-bottom-right-radius:3px;color:#d4fff8}
+.mrow.other .bubble{background:var(--s2);border:1px solid var(--border2);border-bottom-left-radius:3px}
+.mrow.sys  .bubble{background:transparent;border:1px solid var(--border);border-radius:7px;font-family:var(--mono);font-size:10px;color:var(--muted2);padding:5px 14px}
 .mmeta{display:flex;align-items:center;gap:5px;margin-top:3px;font-family:var(--mono);font-size:9px;color:var(--muted);flex-wrap:wrap}
-.sok{color:var(--teal)}
-.sng{color:var(--rose)}
+.sok{color:var(--teal)} .sng{color:var(--rose)}
 .dbtn{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:9px;cursor:pointer;padding:0 2px;opacity:.6}
 .dbtn:hover{opacity:1;color:var(--teal)}
-.dbox{display:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:5px;font-family:var(--mono);font-size:9px;color:var(--muted2);word-break:break-all;line-height:1.75;max-width:420px}
+.dbox{display:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px;margin-top:4px;font-family:var(--mono);font-size:9px;color:var(--muted2);word-break:break-all;line-height:1.75;max-width:420px}
 .dbox.open{display:block}
-.dl{color:var(--teal);letter-spacing:1px;font-size:8px;margin-top:5px;margin-bottom:1px}
-.fbubble{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;min-width:220px}
-.ficon{font-size:26px;flex-shrink:0}
+.dl{color:var(--teal);letter-spacing:1px;font-size:8px;margin-top:4px;margin-bottom:1px}
+
+/* File bubble */
+.fbubble{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;min-width:200px}
+.ficon{font-size:24px;flex-shrink:0}
 .finfo{flex:1;min-width:0}
 .fname{font-family:var(--mono);font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fmeta{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px}
-.fdlbtn{font-family:var(--mono);font-size:10px;padding:6px 12px;border-radius:5px;background:var(--teal-g);border:1px solid rgba(56,217,192,.25);color:var(--teal);cursor:pointer;white-space:nowrap;transition:.2s;flex-shrink:0}
+.fdlbtn{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:5px;background:var(--teal-g);border:1px solid rgba(56,217,192,.25);color:var(--teal);cursor:pointer;white-space:nowrap;transition:.2s;flex-shrink:0}
 .fdlbtn:hover{background:rgba(56,217,192,.28)}
 .fdlbtn:disabled{opacity:.4;cursor:not-allowed}
-.input-wrap{padding:14px 18px;border-top:1px solid var(--border);background:var(--s1);flex-shrink:0}
-.input-row{display:flex;gap:9px;align-items:flex-end}
-textarea.mi{flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--jp);font-size:13.5px;padding:10px 13px;border-radius:9px;outline:none;resize:none;min-height:42px;max-height:110px;line-height:1.5;transition:border-color .2s}
+
+/* Input */
+.input-wrap{padding:12px 16px;border-top:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+textarea.mi{flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--jp);font-size:13.5px;padding:9px 12px;border-radius:9px;outline:none;resize:none;min-height:40px;max-height:110px;line-height:1.5;transition:border-color .2s}
 textarea.mi:focus{border-color:rgba(56,217,192,.4)}
 textarea.mi:disabled{opacity:.35}
-.sbtn{width:42px;height:42px;border-radius:9px;background:var(--teal);color:#061a17;border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;font-weight:700}
+.sbtn{width:40px;height:40px;border-radius:9px;background:var(--teal);color:#061a17;border:none;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;font-weight:700}
 .sbtn:hover{box-shadow:0 0 18px var(--teal-gl);transform:scale(1.05)}
 .sbtn:disabled{opacity:.28;cursor:not-allowed;transform:none}
-.fbtn{width:42px;height:42px;border-radius:9px;background:var(--s3);color:var(--muted2);border:1px solid var(--border2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.fbtn{width:40px;height:40px;border-radius:9px;background:var(--s3);color:var(--muted2);border:1px solid var(--border2);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
 .fbtn:hover{color:var(--teal);border-color:rgba(56,217,192,.3)}
 .fbtn:disabled{opacity:.3;cursor:not-allowed}
-.ichips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+
+/* OVERLAY */
 #overlay{position:fixed;inset:0;background:rgba(7,9,15,.94);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;z-index:500;transition:opacity .35s}
 #overlay.hide{opacity:0;pointer-events:none}
-.ocard{background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:38px;text-align:center;max-width:400px;width:92%}
-.oicon{font-size:50px;margin-bottom:18px}
-.otitle{font-family:var(--sans);font-size:23px;font-weight:800;color:#fff;margin-bottom:7px}
-.osub{font-size:12.5px;color:var(--muted2);line-height:1.65;margin-bottom:26px}
+.ocard{background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:36px;text-align:center;max-width:400px;width:92%}
+.oicon{font-size:48px;margin-bottom:16px}
+.otitle{font-family:var(--sans);font-size:22px;font-weight:800;color:#fff;margin-bottom:6px}
+.osub{font-size:12.5px;color:var(--muted2);line-height:1.65;margin-bottom:24px}
 .oform{display:flex;flex-direction:column;gap:10px}
-.oi{background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:13px;padding:11px 15px;border-radius:7px;outline:none;text-align:center;transition:.2s}
+.oi{background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;border-radius:7px;outline:none;text-align:center;transition:.2s}
 .oi:focus{border-color:var(--teal)}
-.obtn{font-family:var(--sans);font-weight:700;font-size:14px;padding:12px;border-radius:7px;border:none;cursor:pointer;transition:.2s}
-.op{background:var(--teal);color:#061a17}
-.op:hover{box-shadow:0 0 18px var(--teal-gl)}
+.obtn{font-family:var(--sans);font-weight:700;font-size:14px;padding:11px;border-radius:7px;border:none;cursor:pointer;transition:.2s}
+.op{background:var(--teal);color:#061a17}.op:hover{box-shadow:0 0 18px var(--teal-gl)}
 .os{background:var(--s3);color:var(--text);border:1px solid var(--border2)}
 .odiv{font-family:var(--mono);font-size:10px;color:var(--muted)}
 .ohint{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.65;margin-top:14px}
-.spin{width:38px;height:38px;border:3px solid var(--border2);border-top-color:var(--teal);border-radius:50%;animation:sp .75s linear infinite;margin:0 auto 18px}
+.spin{width:36px;height:36px;border:3px solid var(--border2);border-top-color:var(--teal);border-radius:50%;animation:sp .75s linear infinite;margin:0 auto 16px}
 @keyframes sp{to{transform:rotate(360deg)}}
-#klog{font-family:var(--mono);font-size:10px;color:var(--muted2);text-align:left;line-height:1.85;margin-top:10px;max-height:140px;overflow-y:auto}
+#klog{font-family:var(--mono);font-size:10px;color:var(--muted2);text-align:left;line-height:1.85;margin-top:10px;max-height:130px;overflow-y:auto}
 #klog::-webkit-scrollbar{width:2px}
-#klog::-webkit-scrollbar-thumb{background:var(--border2)}
-.prog{margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;height:6px;overflow:hidden}
+.prog{margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;height:5px;overflow:hidden}
 .progb{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));width:0;transition:width .3s}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;padding:9px 18px;border-radius:7px;background:var(--s2);border:1px solid var(--border2);color:var(--text);opacity:0;transition:opacity .25s;pointer-events:none;z-index:8000;white-space:nowrap}
 #toast.show{opacity:1}
+
+/* Member avatar colors */
+.av0{background:rgba(56,217,192,.2);border-color:rgba(56,217,192,.3);color:var(--teal)}
+.av1{background:rgba(99,179,255,.2);border-color:rgba(99,179,255,.3);color:var(--blue)}
+.av2{background:rgba(251,191,36,.2);border-color:rgba(251,191,36,.3);color:var(--amber)}
+.av3{background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.3);color:var(--purple)}
+.av4{background:rgba(251,113,133,.2);border-color:rgba(251,113,133,.3);color:var(--rose)}
+.av5{background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.3);color:var(--green)}
 </style>
 </head>
 <body>
 
 <div id="overlay">
+  <!-- Join -->
   <div class="ocard" id="ov-join">
     <div class="oicon">&#128272;</div>
-    <div class="otitle">CipherTalk <span style="color:var(--teal);font-size:15px">v2</span></div>
-    <div class="osub">E2Eテキストチャット + ファイル転送<br>ECDHE &middot; DH &middot; RSA-OAEP &middot; RSA-PSS &middot; AES-256-GCM</div>
+    <div class="otitle">CipherTalk <span style="color:var(--teal);font-size:14px">v3</span></div>
+    <div class="osub">1人でも複数人でも使えるE2E暗号化チャット<br>ECDHE &middot; DH &middot; RSA-OAEP &middot; RSA-PSS &middot; AES-256-GCM</div>
     <div class="oform">
       <input class="oi" id="in-name" type="text" placeholder="あなたの名前" maxlength="20" autocomplete="off">
       <input class="oi" id="in-room" type="text" placeholder="ルームID (英数字)" maxlength="32" autocomplete="off">
-      <button class="obtn op" onclick="doJoin()">入室する</button>
+      <button class="obtn op" onclick="doJoin()">入室する &#8594;</button>
       <div class="odiv">または</div>
       <button class="obtn os" onclick="randomRoom()">ランダムルームを作成</button>
     </div>
-    <div class="ohint">&#128279; 同じルームIDで2人が入室すると暗号化通信開始<br>&#128274; メッセージ・ファイルはブラウザ内で暗号化されます</div>
+    <div class="ohint">&#128279; 同じルームIDで入室すると暗号化通信開始<br>&#128100; 1人でも入室して待機できます<br>&#128274; メッセージはブラウザ内で暗号化されます</div>
   </div>
 
-  <div class="ocard" id="ov-wait" style="display:none">
-    <div class="spin"></div>
-    <div class="otitle">待機中</div>
-    <div class="osub" id="ov-wait-sub">相手の接続を待っています...</div>
-    <div style="font-family:var(--mono);font-size:12px;color:var(--teal);margin:12px 0" id="ov-room-id"></div>
-    <div class="ohint">このルームIDを相手に伝えてください</div>
-  </div>
-
+  <!-- Key exchange -->
   <div class="ocard" id="ov-keyx" style="display:none">
     <div class="spin"></div>
     <div class="otitle">鍵交換中</div>
-    <div class="osub">ECDHE + RSAで安全なチャンネルを確立しています</div>
+    <div class="osub">安全なチャンネルを確立しています</div>
     <div class="prog"><div class="progb" id="kprogb"></div></div>
     <div id="klog"></div>
   </div>
@@ -173,7 +204,7 @@ textarea.mi:disabled{opacity:.35}
   <div class="logo">
     <div class="logo-gem">&#128272;</div>
     Cipher<em>Talk</em>
-    <span style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:4px">v2</span>
+    <span style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-left:4px">v3</span>
   </div>
   <div class="hbar">
     <span class="sdot" id="h-dot"></span>
@@ -184,74 +215,71 @@ textarea.mi:disabled{opacity:.35}
 </header>
 
 <div class="app">
+  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sb-sec">
       <div class="sb-lbl">ルーム</div>
-      <div id="room-display" style="color:var(--muted)">— 未接続 —</div>
+      <div id="room-disp" style="color:var(--muted)">— 未接続 —</div>
       <div style="margin-top:8px;display:none" id="leave-wrap">
         <button class="leave-btn" onclick="doLeave()">退出する</button>
       </div>
     </div>
+
     <div class="sb-sec">
-      <div class="sb-lbl">暗号化プロトコル</div>
+      <div class="sb-lbl">参加者 <span id="member-count" style="color:var(--teal)"></span></div>
+      <div class="members-list" id="members-list"></div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">暗号化</div>
       <div id="chips">
-        <span class="chip ct" style="opacity:.3">ECDHE P-256</span>
-        <span class="chip cb" style="opacity:.3">DH 鍵交換</span>
+        <span class="chip ct" style="opacity:.3">ECDHE</span>
+        <span class="chip cb" style="opacity:.3">DH</span>
         <span class="chip ca" style="opacity:.3">RSA-OAEP</span>
         <span class="chip cp" style="opacity:.3">RSA-PSS</span>
         <span class="chip ct" style="opacity:.3">AES-256-GCM</span>
       </div>
     </div>
+
     <div class="cscroll">
-      <div class="sb-lbl">暗号化詳細</div>
       <div class="ccard" id="card-ecdh">
         <div class="chead"><span class="calgo">1. ECDHE P-256</span><span class="cchk" id="ck-ecdh">&#9679;</span></div>
-        <div class="cbody"><div class="dim">一時的鍵ペアで前方秘匿性を確保</div><div id="v-ecdh" style="margin-top:4px;color:var(--muted)">待機中</div></div>
+        <div class="cbody"><div class="dim">一時鍵・前方秘匿性</div><div id="v-ecdh" style="margin-top:3px;color:var(--muted)">待機中</div></div>
       </div>
-      <div class="ccard" id="card-dh">
-        <div class="chead"><span class="calgo">2. Diffie-Hellman</span><span class="cchk" id="ck-dh">&#9679;</span></div>
-        <div class="cbody"><div class="dim">共通秘密 → AESセッション鍵導出</div><div id="v-dh" style="margin-top:4px;color:var(--muted)">待機中</div></div>
+      <div class="ccard" id="card-rsa">
+        <div class="chead"><span class="calgo">2. RSA-OAEP + PSS</span><span class="cchk" id="ck-rsa">&#9679;</span></div>
+        <div class="cbody"><div class="dim">ルーム鍵の配送・署名</div><div id="v-rsa" style="margin-top:3px;color:var(--muted)">待機中</div></div>
       </div>
-      <div class="ccard" id="card-oaep">
-        <div class="chead"><span class="calgo">3. RSA-OAEP</span><span class="cchk" id="ck-oaep">&#9679;</span></div>
-        <div class="cbody"><div class="dim">ファイル用AES鍵を公開鍵でラップ</div><div id="v-oaep" style="margin-top:4px;color:var(--muted)">待機中</div></div>
+      <div class="ccard" id="card-room">
+        <div class="chead"><span class="calgo">3. AES-256-GCM</span><span class="cchk" id="ck-room">&#9679;</span></div>
+        <div class="cbody"><div class="dim">グループメッセージ暗号化</div><div id="v-room" style="margin-top:3px;color:var(--muted)">待機中</div></div>
       </div>
-      <div class="ccard" id="card-pss">
-        <div class="chead"><span class="calgo">4. RSA-PSS</span><span class="cchk" id="ck-pss">&#9679;</span></div>
-        <div class="cbody"><div class="dim">送信者認証・改ざん検知</div><div id="v-pss" style="margin-top:4px;color:var(--muted)">待機中</div></div>
-      </div>
-      <div class="ccard" id="card-aes">
-        <div class="chead"><span class="calgo">5. AES-256-GCM</span><span class="cchk" id="ck-aes">&#9679;</span></div>
-        <div class="cbody"><div class="dim">認証付き暗号化</div><div id="v-aes" style="margin-top:4px;color:var(--muted)">待機中</div></div>
-      </div>
-      <div class="sb-sec" style="margin:10px -16px -14px;padding-top:10px">
-        <div class="sb-lbl">通信統計</div>
-        <div class="sg">
-          <div class="sc"><div class="sn" id="st-s">0</div><div class="sl">送信メッセージ</div></div>
-          <div class="sc"><div class="sn" id="st-r">0</div><div class="sl">受信メッセージ</div></div>
-          <div class="sc"><div class="sn" id="st-fs">0</div><div class="sl">送信ファイル</div></div>
-          <div class="sc"><div class="sn" id="st-fr">0</div><div class="sl">受信ファイル</div></div>
-        </div>
+      <div class="sg">
+        <div class="sc"><div class="sn" id="st-s">0</div><div class="sl">送信</div></div>
+        <div class="sc"><div class="sn" id="st-r">0</div><div class="sl">受信</div></div>
+        <div class="sc"><div class="sn" id="st-p">1</div><div class="sl">参加者</div></div>
+        <div class="sc"><div class="sn" id="st-f">0</div><div class="sl">ファイル</div></div>
       </div>
     </div>
   </div>
 
+  <!-- CHAT -->
   <div class="chat-wrap">
     <div class="chat-head">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="pava" id="p-ava">?</div>
-        <div>
-          <div class="pname" id="p-name">— 未接続 —</div>
-          <div class="psub" id="p-sub">ルームに参加してください</div>
-        </div>
+      <div>
+        <div class="room-title" id="room-title">— 未接続 —</div>
+        <div class="room-sub" id="room-sub">ルームに参加してください</div>
       </div>
-      <div id="e2e-pill">&#128274; E2E暗号化</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div id="wait-pill">&#128100; 待機中</div>
+        <div id="e2e-pill">&#128274; E2E暗号化</div>
+      </div>
     </div>
 
     <div class="msgs" id="msgs">
       <div class="empty" id="empty-state">
         <div class="ei">&#128272;</div>
-        <p>同じルームに接続すると、エンドツーエンド暗号化されたチャットとファイル転送が始まります</p>
+        <p>ルームに入室して、暗号化チャットを始めましょう。1人でも待機できます。</p>
         <div class="ehint">ECDHE &middot; DH &middot; RSA-OAEP &middot; RSA-PSS &middot; AES-256-GCM</div>
       </div>
     </div>
@@ -259,14 +287,9 @@ textarea.mi:disabled{opacity:.35}
     <div class="input-wrap">
       <div class="input-row">
         <input type="file" id="file-input" style="display:none" onchange="onFileSelect(event)">
-        <button class="fbtn" id="file-btn" disabled onclick="document.getElementById('file-input').click()" title="ファイルを送信">&#128206;</button>
+        <button class="fbtn" id="file-btn" disabled onclick="document.getElementById('file-input').click()" title="ファイル送信">&#128206;</button>
         <textarea class="mi" id="mi" placeholder="メッセージを入力… (Enterで送信)" rows="1" disabled onkeydown="onKey(event)" oninput="autoH(this)"></textarea>
         <button class="sbtn" id="send-btn" disabled onclick="doSend()">&#8593;</button>
-      </div>
-      <div class="ichips">
-        <span class="chip ct" style="opacity:.5">AES-256-GCM</span>
-        <span class="chip cp" style="opacity:.5">RSA-PSS 署名</span>
-        <span class="chip ca" style="opacity:.5">ファイル: RSA-OAEP</span>
       </div>
     </div>
   </div>
@@ -275,579 +298,549 @@ textarea.mi:disabled{opacity:.35}
 <div id="toast"></div>
 
 <script>
-(function() {
+(function(){
 'use strict';
 
 // ── STATE ──────────────────────────────────────────────────────────
-var S = { myName:'', peerName:'', roomId:'', sm:0, rm:0, sf:0, rf:0 };
+var S = {
+  myName:'', myId:'', roomId:'',
+  sm:0, rm:0, sf:0, rf:0
+};
 
-var ws            = null;
-var myEcdh        = null;   // ECDH P-256 ephemeral key pair
-var myRsaEnc      = null;   // RSA-OAEP key pair (file key wrap)
-var myRsaSig      = null;   // RSA-PSS key pair (signing)
-var sessionKey    = null;   // AES-256-GCM (derived from ECDH)
-var peerRsaEncPub = null;   // peer's RSA-OAEP public key
-var peerRsaSigPub = null;   // peer's RSA-PSS public key
-var pendingKeyx   = null;   // buffer peer keyx if arrives before our keys are ready
-var myKeysReady   = false;  // flag: our keys are generated
-var handshakeDone = false;  // flag: handshake complete (prevent double-call)
-var msgN          = 0;
+var ws          = null;
+var myEcdh      = null;   // ECDH ephemeral key pair
+var myRsaEnc    = null;   // RSA-OAEP key pair (receive wrapped room key)
+var myRsaSig    = null;   // RSA-PSS key pair (sign messages)
+var roomKey     = null;   // AES-256-GCM group room key
+var myKeysReady = false;
+
+// peers: Map<clientId, { name, rsaEncPub, rsaSigPub, color }>
+var peers = new Map();
+// Color palette index
+var colorIdx = 0;
+var COLORS = ['av1','av2','av3','av4','av5'];
+var msgN = 0;
 
 // ── UTILS ──────────────────────────────────────────────────────────
-function ab2b64(buf) {
-  var bytes = new Uint8Array(buf);
-  var binary = '';
-  for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  return btoa(binary);
-}
-function b642ab(s) {
-  var binary = atob(s);
-  var buf = new Uint8Array(binary.length);
-  for (var i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i);
-  return buf.buffer;
-}
-function ab2hex(buf) {
-  return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
-}
-function rnd(n) {
-  var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  var bytes = crypto.getRandomValues(new Uint8Array(n));
-  return Array.from(bytes).map(function(b){ return chars[b % chars.length]; }).join('');
-}
-function fmtSize(b) {
-  if (b > 1048576) return (b/1048576).toFixed(1)+'MB';
-  if (b > 1024)    return (b/1024).toFixed(1)+'KB';
-  return b+'B';
-}
-function esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function toast(msg, ms) {
-  ms = ms || 2500;
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, ms);
-}
-function J(o) { return JSON.stringify(o); }
+function ab2b64(buf){var b=new Uint8Array(buf),s='';for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s);}
+function b642ab(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer;}
+function ab2hex(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');}
+function rnd(n){var c='abcdefghijklmnopqrstuvwxyz0123456789',b=crypto.getRandomValues(new Uint8Array(n));return Array.from(b).map(function(x){return c[x%c.length];}).join('');}
+function fmtSize(b){if(b>1048576)return(b/1048576).toFixed(1)+'MB';if(b>1024)return(b/1024).toFixed(1)+'KB';return b+'B';}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function J(o){return JSON.stringify(o);}
+function toast(msg,ms){ms=ms||2500;var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},ms);}
 
 // ── OVERLAY ────────────────────────────────────────────────────────
-function showOv(id) {
-  ['ov-join','ov-wait','ov-keyx'].forEach(function(x){
-    document.getElementById(x).style.display = (x === id) ? 'block' : 'none';
+function showOv(id){
+  ['ov-join','ov-keyx'].forEach(function(x){
+    document.getElementById(x).style.display=(x===id)?'block':'none';
   });
   document.getElementById('overlay').classList.remove('hide');
 }
-function hideOv() {
-  document.getElementById('overlay').classList.add('hide');
-}
+function hideOv(){document.getElementById('overlay').classList.add('hide');}
 
-var kpct = 0;
-function klog(msg) {
-  var el = document.getElementById('klog');
-  el.innerHTML += msg + '<br>';
-  el.scrollTop = el.scrollHeight;
-  kpct = Math.min(kpct + 18, 95);
-  document.getElementById('kprogb').style.width = kpct + '%';
-}
-function kdone() {
-  document.getElementById('kprogb').style.width = '100%';
-}
+var kpct=0;
+function klog(msg){var el=document.getElementById('klog');el.innerHTML+=msg+'<br>';el.scrollTop=el.scrollHeight;kpct=Math.min(kpct+15,95);document.getElementById('kprogb').style.width=kpct+'%';}
+function kdone(){document.getElementById('kprogb').style.width='100%';}
 
 // ── JOIN ───────────────────────────────────────────────────────────
-window.randomRoom = function() {
-  document.getElementById('in-room').value = rnd(10);
-};
+window.randomRoom=function(){document.getElementById('in-room').value=rnd(10);};
 
-window.doJoin = function() {
-  S.myName = document.getElementById('in-name').value.trim() || ('User_' + rnd(4));
-  S.roomId = document.getElementById('in-room').value.trim() || rnd(10);
-  showOv('ov-wait');
-  document.getElementById('ov-room-id').textContent = 'Room: ' + S.roomId;
-  document.getElementById('ov-wait-sub').textContent = '"' + S.myName + '" として待機中...';
+window.doJoin=function(){
+  S.myName=document.getElementById('in-name').value.trim()||('User_'+rnd(4));
+  S.roomId=document.getElementById('in-room').value.trim()||rnd(10);
   connectWS();
 };
 
-// Pre-fill room from URL param
 (function(){
-  var p = new URLSearchParams(location.search);
-  var r = p.get('room');
-  if (r) document.getElementById('in-room').value = r;
+  var p=new URLSearchParams(location.search);
+  var r=p.get('room');
+  if(r) document.getElementById('in-room').value=r;
 })();
 
 // ── WEBSOCKET ──────────────────────────────────────────────────────
-function connectWS() {
-  var proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  ws = new WebSocket(proto + '//' + location.host);
+function connectWS(){
+  var proto=location.protocol==='https:'?'wss:':'ws:';
+  ws=new WebSocket(proto+'//'+location.host);
 
-  ws.onopen = function() {
-    ws.send(J({ type:'join', room:S.roomId, name:S.myName }));
+  ws.onopen=function(){
+    ws.send(J({type:'join',room:S.roomId,name:S.myName}));
   };
 
-  ws.onmessage = function(ev) {
+  ws.onmessage=function(ev){
     var msg;
-    try { msg = JSON.parse(ev.data); } catch(e) { return; }
+    try{msg=JSON.parse(ev.data);}catch(e){return;}
 
-    if (msg.type === 'joined') {
-      if (!msg.initiator) {
-        startKeyExchange();
+    if(msg.type==='joined'){
+      S.myId=msg.clientId;
+      setupUI();
+      generateMyKeys(msg.members);
+
+    }else if(msg.type==='peer_joined'){
+      // New peer joined - add to sidebar, send them our hello if we're ready
+      if(!peers.has(msg.clientId)){
+        peers.set(msg.clientId,{name:msg.name,rsaEncPub:null,rsaSigPub:null,color:COLORS[colorIdx++%COLORS.length]});
       }
-      // initiator waits for peer_joined
-
-    } else if (msg.type === 'peer_joined') {
-      S.peerName = msg.name || '';
-      startKeyExchange();
-
-    } else if (msg.type === 'keyx') {
-      // Buffer if our keys aren't ready yet (race condition fix)
-      if (!myKeysReady) {
-        pendingKeyx = msg;
-      } else {
-        handleKeyx(msg);
+      updateMembersList();
+      sysmsg('&#128075; '+esc(msg.name)+' が参加しました');
+      // If we already have room key, send them hello so they can get the key
+      if(myKeysReady){
+        sendHello(msg.clientId);
       }
 
-    } else if (msg.type === 'keyx_ack') {
-      handleKeyxAck(msg);
+    }else if(msg.type==='hello'){
+      // Someone sent us their public keys
+      handleHello(msg);
 
-    } else if (msg.type === 'chat') {
+    }else if(msg.type==='room_key'){
+      // Room key delivered to us (RSA-OAEP wrapped)
+      if(msg.to===S.myId) handleRoomKey(msg);
+
+    }else if(msg.type==='chat'){
       handleChat(msg);
 
-    } else if (msg.type === 'file_available') {
-      addFileBubble(msg, 'peer');
+    }else if(msg.type==='file_available'){
+      addFileBubble(msg,'other');
 
-    } else if (msg.type === 'peer_left') {
-      sysmsg('&#128308; ' + (msg.name || '相手') + ' が退出しました');
-      setHStatus('dead', '切断');
-      disableInput();
+    }else if(msg.type==='peer_left'){
+      var lname=(peers.has(msg.clientId)?peers.get(msg.clientId).name:msg.name)||'Someone';
+      peers.delete(msg.clientId);
+      updateMembersList();
+      sysmsg('&#128308; '+esc(lname)+' が退出しました');
+      updateStats();
 
-    } else if (msg.type === 'error') {
-      if (msg.code === 'room_full') {
-        alert('ルームが満室です。別のルームIDをお試しください。');
-        showOv('ov-join');
-      }
+    }else if(msg.type==='error'){
+      toast('エラー: '+(msg.code||msg.message||'不明'));
     }
   };
 
-  ws.onclose = function() {
-    setHStatus('dead', '切断');
+  ws.onclose=function(){
+    setHStatus('dead','切断');
+    disableInput();
   };
 }
 
-// ── CRYPTO HANDSHAKE ───────────────────────────────────────────────
-function startKeyExchange() {
-  showOv('ov-keyx');
-  kpct = 0;
-  klog('1. ECDHE P-256 鍵ペアを生成中 (ephemeral Diffie-Hellman)...');
+// ── KEY GENERATION ─────────────────────────────────────────────────
+function generateMyKeys(existingMembers){
+  showOv('ov-keyx'); kpct=0;
+  klog('1. ECDHE P-256 鍵ペアを生成中...');
 
-  crypto.subtle.generateKey(
-    { name:'ECDH', namedCurve:'P-256' }, true, ['deriveKey']
-  ).then(function(kp) {
-    myEcdh = kp;
-    return crypto.subtle.exportKey('spki', myEcdh.publicKey);
-  }).then(function(ecdhPub) {
-    klog('   ✓ ECDH P-256 (前方秘匿性確保)');
-    setCard('ecdh', ab2hex(ecdhPub).slice(0,32) + '...');
-    klog('2. RSA-2048 OAEP 鍵ペアを生成中 (ファイル用AES鍵ラップ)...');
-    return Promise.all([
-      Promise.resolve(ecdhPub),
-      crypto.subtle.generateKey(
-        { name:'RSA-OAEP', modulusLength:2048, publicExponent:new Uint8Array([1,0,1]), hash:'SHA-256' },
-        true, ['encrypt','decrypt']
-      )
-    ]);
-  }).then(function(results) {
-    var ecdhPub = results[0];
-    myRsaEnc = results[1];
-    klog('   ✓ RSA-2048 OAEP (ファイルAES鍵ラップ)');
-    setCard('oaep', '生成済み — RSA-2048 OAEP');
-    klog('3. RSA-2048 PSS 鍵ペアを生成中 (メッセージ署名)...');
-    return Promise.all([
-      Promise.resolve(ecdhPub),
-      crypto.subtle.generateKey(
-        { name:'RSA-PSS', modulusLength:2048, publicExponent:new Uint8Array([1,0,1]), hash:'SHA-256' },
-        true, ['sign','verify']
-      )
-    ]);
-  }).then(function(results) {
-    var ecdhPub = results[0];
-    myRsaSig = results[1];
-    klog('   ✓ RSA-2048 PSS (署名/検証)');
-    setCard('pss', '生成済み — RSA-2048 PSS');
-
-    return Promise.all([
-      Promise.resolve(ecdhPub),
-      crypto.subtle.exportKey('spki', myRsaEnc.publicKey),
-      crypto.subtle.exportKey('spki', myRsaSig.publicKey)
-    ]);
-  }).then(function(pubs) {
-    var ecdhPub   = pubs[0];
-    var rsaEncPub = pubs[1];
-    var rsaSigPub = pubs[2];
-
-    klog('4. 公開鍵を送信中...');
-    myKeysReady = true;  // 鍵生成完了
-
-    ws.send(J({
-      type:      'keyx',
-      name:      S.myName,
-      ecdhPub:   ab2b64(ecdhPub),
-      rsaEncPub: ab2b64(rsaEncPub),
-      rsaSigPub: ab2b64(rsaSigPub)
-    }));
-
-    // Process buffered peer keyx if it arrived while we were generating keys
-    if (pendingKeyx) {
-      klog('   ✓ バッファ済みの相手公開鍵を処理中...');
-      var buf = pendingKeyx;
-      pendingKeyx = null;
-      handleKeyx(buf);
-    } else {
-      klog('5. 相手の公開鍵を待機中...');
-    }
-  }).catch(function(e) {
-    klog('ERROR: ' + e.message);
-    console.error('Key generation error:', e);
-  });
-}
-
-function handleKeyx(msg) {
-  klog('✓ 相手の公開鍵を受信');
-  S.peerName = msg.name || S.peerName || '相手';
-
-  var peerEcdhPubRaw   = b642ab(msg.ecdhPub);
-  var peerRsaEncPubRaw = b642ab(msg.rsaEncPub);
-  var peerRsaSigPubRaw = b642ab(msg.rsaSigPub);
-
-  crypto.subtle.importKey('spki', peerEcdhPubRaw, { name:'ECDH', namedCurve:'P-256' }, false, [])
-  .then(function(peerEcdhPub) {
-    return Promise.all([
-      Promise.resolve(peerEcdhPub),
-      crypto.subtle.importKey('spki', peerRsaEncPubRaw, { name:'RSA-OAEP', hash:'SHA-256' }, false, ['encrypt']),
-      crypto.subtle.importKey('spki', peerRsaSigPubRaw, { name:'RSA-PSS', hash:'SHA-256' }, false, ['verify'])
-    ]);
-  }).then(function(keys) {
-    var peerEcdhPub = keys[0];
-    peerRsaEncPub   = keys[1];
-    peerRsaSigPub   = keys[2];
-    setCard('oaep', '✓ 相手の公開鍵インポート済み');
-    setCard('pss',  '✓ 相手の署名公開鍵インポート済み');
-
-    klog('5. ECDH共通秘密からAES-256-GCMセッション鍵を導出 (Diffie-Hellman)...');
-    return crypto.subtle.deriveKey(
-      { name:'ECDH', public: peerEcdhPub },
-      myEcdh.privateKey,
-      { name:'AES-GCM', length:256 }, true, ['encrypt','decrypt']
+  crypto.subtle.generateKey({name:'ECDH',namedCurve:'P-256'},true,['deriveKey'])
+  .then(function(kp){
+    myEcdh=kp;
+    klog('   ✓ ECDH P-256 (前方秘匿性)');
+    klog('2. RSA-2048 OAEP 鍵ペアを生成中...');
+    return crypto.subtle.generateKey(
+      {name:'RSA-OAEP',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},
+      true,['encrypt','decrypt']
     );
-  }).then(function(sk) {
-    sessionKey = sk;
-    return crypto.subtle.exportKey('raw', sessionKey);
-  }).then(function(raw) {
-    klog('   ✓ AES-256-GCMセッション鍵導出完了');
-    setCard('dh',  '✓ DH共通秘密 → AES-256-GCMセッション鍵\n' + ab2hex(raw).slice(0,32) + '...');
-    setCard('aes', '✓ セッション鍵確立 — すべてのメッセージを暗号化');
+  }).then(function(kp){
+    myRsaEnc=kp;
+    klog('   ✓ RSA-2048 OAEP (ルーム鍵ラップ)');
+    klog('3. RSA-2048 PSS 鍵ペアを生成中...');
+    return crypto.subtle.generateKey(
+      {name:'RSA-PSS',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},
+      true,['sign','verify']
+    );
+  }).then(function(kp){
+    myRsaSig=kp;
+    klog('   ✓ RSA-2048 PSS (メッセージ署名)');
+    setCard('ecdh','✓ ECDH P-256 生成済み');
+    setCard('rsa','✓ RSA-OAEP + PSS 生成済み');
+    myKeysReady=true;
 
-    // Send keyx_ack so the other side can finalize if they're waiting
-    ws.send(J({ type:'keyx_ack', name:S.myName }));
-    finishHandshake();
-  }).catch(function(e) {
-    klog('ERROR in handleKeyx: ' + e.message);
-    console.error('handleKeyx error:', e);
+    if(existingMembers && existingMembers.length>0){
+      // Room already has people: announce ourselves to all
+      klog('4. 既存参加者に公開鍵を送信中...');
+      return sendHelloAll().then(function(){
+        klog('   ✓ Hello 送信完了');
+        klog('5. ルーム鍵の配送を待機中...');
+        // Don't finish yet — wait for room_key from existing member
+      });
+    } else {
+      // We're the first (or only) person: generate room AES key
+      klog('4. ルームAES-256-GCM鍵を生成中...');
+      return crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt'])
+      .then(function(k){
+        roomKey=k;
+        return crypto.subtle.exportKey('raw',roomKey);
+      }).then(function(raw){
+        klog('   ✓ AES-256-GCM ルーム鍵生成完了');
+        setCard('room','✓ ルーム鍵生成済み — '+ab2hex(raw).slice(0,24)+'...');
+        kdone();
+        finishSetup();
+      });
+    }
+  }).catch(function(e){
+    klog('ERROR: '+e.message);
+    console.error(e);
   });
 }
 
-function handleKeyxAck(msg) {
-  if (sessionKey) return; // already done via handleKeyx path
-  S.peerName = msg.name || S.peerName;
-  finishHandshake();
+// Send our public keys to a specific peer (or broadcast)
+function sendHello(targetId){
+  return Promise.all([
+    crypto.subtle.exportKey('spki',myRsaEnc.publicKey),
+    crypto.subtle.exportKey('spki',myRsaSig.publicKey)
+  ]).then(function(pubs){
+    var msg={type:'hello',to:targetId||undefined,rsaEncPub:ab2b64(pubs[0]),rsaSigPub:ab2b64(pubs[1])};
+    ws.send(J(msg));
+  });
 }
 
-function finishHandshake() {
-  if (handshakeDone) return;
-  handshakeDone = true;
-  kdone();
+function sendHelloAll(){
+  return Promise.all([
+    crypto.subtle.exportKey('spki',myRsaEnc.publicKey),
+    crypto.subtle.exportKey('spki',myRsaSig.publicKey)
+  ]).then(function(pubs){
+    // Broadcast (no 'to' field)
+    ws.send(J({type:'hello',rsaEncPub:ab2b64(pubs[0]),rsaSigPub:ab2b64(pubs[1])}));
+  });
+}
+
+// Handle incoming hello: store peer's keys, send room_key if we have it
+function handleHello(msg){
+  var fromId=msg.from, fromName=msg.fromName||'?';
+
+  Promise.all([
+    crypto.subtle.importKey('spki',b642ab(msg.rsaEncPub),{name:'RSA-OAEP',hash:'SHA-256'},false,['encrypt']),
+    crypto.subtle.importKey('spki',b642ab(msg.rsaSigPub),{name:'RSA-PSS',hash:'SHA-256'},false,['verify'])
+  ]).then(function(keys){
+    var peerData=peers.get(fromId)||{name:fromName,color:COLORS[colorIdx++%COLORS.length]};
+    peerData.rsaEncPub=keys[0];
+    peerData.rsaSigPub=keys[1];
+    peers.set(fromId,peerData);
+    updateMembersList();
+
+    // If we have the room key, send it to this peer
+    if(roomKey){
+      return crypto.subtle.exportKey('raw',roomKey)
+      .then(function(raw){
+        return crypto.subtle.encrypt({name:'RSA-OAEP'},peerData.rsaEncPub,raw);
+      }).then(function(wrapped){
+        ws.send(J({type:'room_key',to:fromId,wrappedKey:ab2b64(wrapped)}));
+        klog&&console.log('Room key sent to '+fromName);
+      });
+    }
+  }).catch(function(e){console.error('handleHello error',e);});
+}
+
+// We received the room key wrapped for us
+function handleRoomKey(msg){
+  crypto.subtle.decrypt({name:'RSA-OAEP'},myRsaEnc.privateKey,b642ab(msg.wrappedKey))
+  .then(function(raw){
+    return crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},true,['encrypt','decrypt']);
+  }).then(function(k){
+    roomKey=k;
+    return crypto.subtle.exportKey('raw',roomKey);
+  }).then(function(raw){
+    klog('   ✓ AES-256-GCM ルーム鍵を受信・復号完了');
+    setCard('room','✓ ルーム鍵受信済み — '+ab2hex(raw).slice(0,24)+'...');
+    kdone();
+    finishSetup();
+  }).catch(function(e){
+    klog('ERROR (room_key): '+e.message);
+    console.error(e);
+  });
+}
+
+function finishSetup(){
   setTimeout(function(){
     hideOv();
-    enableChat();
-  }, 600);
+    activateChat();
+  },500);
 }
 
 // ── SEND MESSAGE ───────────────────────────────────────────────────
-window.doSend = function() {
-  var inp = document.getElementById('mi');
-  var text = inp.value.trim();
-  if (!text || !sessionKey) return;
-  inp.value = '';
-  autoH(inp);
+window.doSend=function(){
+  var inp=document.getElementById('mi');
+  var text=inp.value.trim();
+  if(!text||!roomKey)return;
+  inp.value=''; autoH(inp);
 
-  var iv = crypto.getRandomValues(new Uint8Array(12));
-  var enc = new TextEncoder();
+  var iv=crypto.getRandomValues(new Uint8Array(12));
+  var enc=new TextEncoder();
 
-  crypto.subtle.encrypt({ name:'AES-GCM', iv:iv }, sessionKey, enc.encode(text))
-  .then(function(ct) {
+  crypto.subtle.encrypt({name:'AES-GCM',iv:iv},roomKey,enc.encode(text))
+  .then(function(ct){
     return Promise.all([Promise.resolve(ct),
-      crypto.subtle.sign({ name:'RSA-PSS', saltLength:32 }, myRsaSig.privateKey, ct)
+      crypto.subtle.sign({name:'RSA-PSS',saltLength:32},myRsaSig.privateKey,ct)
     ]);
-  }).then(function(r) {
-    var ct = r[0], sig = r[1];
-    ws.send(J({ type:'chat', iv:ab2b64(iv.buffer), ct:ab2b64(ct), sig:ab2b64(sig), ts:Date.now() }));
-    S.sm++;
-    updateStats();
-    addTextBubble({ text:text, side:'me', sigOk:true, ts:new Date(),
-      ivHex:ab2hex(iv.buffer), ctHex:ab2hex(ct), sigHex:ab2hex(sig) });
-  }).catch(function(e){ toast('送信エラー: ' + e.message); });
+  }).then(function(r){
+    var ct=r[0],sig=r[1];
+    ws.send(J({type:'chat',iv:ab2b64(iv.buffer),ct:ab2b64(ct),sig:ab2b64(sig),ts:Date.now()}));
+    S.sm++; updateStats();
+    addTextBubble({text:text,side:'me',fromName:S.myName,fromId:S.myId,sigOk:true,ts:new Date(),
+      ivHex:ab2hex(iv.buffer),ctHex:ab2hex(ct),sigHex:ab2hex(sig)});
+  }).catch(function(e){toast('送信エラー: '+e.message);});
 };
 
 // ── RECEIVE MESSAGE ────────────────────────────────────────────────
-function handleChat(msg) {
-  if (!sessionKey || !peerRsaSigPub) return;
-  var iv  = new Uint8Array(b642ab(msg.iv));
-  var ct  = b642ab(msg.ct);
-  var sig = b642ab(msg.sig);
-  var sigOk = false, text = '(復号エラー)';
+function handleChat(msg){
+  if(!roomKey)return;
+  var fromId=msg.from,fromName=msg.fromName||'?';
+  var iv=new Uint8Array(b642ab(msg.iv)),ct=b642ab(msg.ct),sig=b642ab(msg.sig);
+  var peer=peers.get(fromId);
 
-  crypto.subtle.verify({ name:'RSA-PSS', saltLength:32 }, peerRsaSigPub, sig, ct)
-  .then(function(ok) {
-    sigOk = ok;
-    return crypto.subtle.decrypt({ name:'AES-GCM', iv:iv }, sessionKey, ct);
-  }).then(function(plain) {
-    text = new TextDecoder().decode(plain);
-    S.rm++;
-    updateStats();
-    addTextBubble({ text:text, side:'peer', sigOk:sigOk, ts:new Date(msg.ts),
-      ivHex:ab2hex(iv.buffer), ctHex:ab2hex(ct), sigHex:ab2hex(sig) });
-  }).catch(function() {
-    S.rm++;
-    updateStats();
-    addTextBubble({ text:text, side:'peer', sigOk:false, ts:new Date(msg.ts),
-      ivHex:'', ctHex:'', sigHex:'' });
+  var verifyPromise;
+  if(peer&&peer.rsaSigPub){
+    verifyPromise=crypto.subtle.verify({name:'RSA-PSS',saltLength:32},peer.rsaSigPub,sig,ct)
+      .catch(function(){return false;});
+  }else{
+    verifyPromise=Promise.resolve(null); // unknown sender
+  }
+
+  verifyPromise.then(function(sigOk){
+    return Promise.all([Promise.resolve(sigOk),
+      crypto.subtle.decrypt({name:'AES-GCM',iv:iv},roomKey,ct)
+    ]);
+  }).then(function(r){
+    var sigOk=r[0],plain=r[1];
+    var text=new TextDecoder().decode(plain);
+    S.rm++; updateStats();
+    addTextBubble({text:text,side:'other',fromName:fromName,fromId:fromId,sigOk:sigOk,
+      ts:new Date(msg.ts),ivHex:ab2hex(iv.buffer),ctHex:ab2hex(ct),sigHex:ab2hex(sig)});
+  }).catch(function(){
+    S.rm++; updateStats();
+    addTextBubble({text:'(復号エラー)',side:'other',fromName:fromName,fromId:fromId,sigOk:false,
+      ts:new Date(msg.ts),ivHex:'',ctHex:'',sigHex:''});
   });
 }
 
 // ── FILE SEND ──────────────────────────────────────────────────────
-window.onFileSelect = function(ev) {
-  var file = ev.target.files[0];
-  if (!file) return;
-  ev.target.value = '';
-  if (!sessionKey || !peerRsaEncPub) { toast('接続が確立されていません'); return; }
-  toast('ファイルを暗号化して送信中...');
+window.onFileSelect=function(ev){
+  var file=ev.target.files[0];
+  if(!file)return;
+  ev.target.value='';
+  if(!roomKey){toast('接続が確立されていません');return;}
+  toast('暗号化して送信中...');
 
-  var fileAesKey, fileIv, rawFileKey;
-
-  crypto.subtle.generateKey({ name:'AES-GCM', length:256 }, true, ['encrypt','decrypt'])
-  .then(function(k) {
-    fileAesKey = k;
-    fileIv = crypto.getRandomValues(new Uint8Array(12));
-    return file.arrayBuffer();
-  }).then(function(buf) {
+  var fileAesKey,fileIv;
+  crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt'])
+  .then(function(k){fileAesKey=k;fileIv=crypto.getRandomValues(new Uint8Array(12));return file.arrayBuffer();})
+  .then(function(buf){
     return Promise.all([
-      crypto.subtle.encrypt({ name:'AES-GCM', iv:fileIv }, fileAesKey, buf),
-      crypto.subtle.exportKey('raw', fileAesKey)
+      crypto.subtle.encrypt({name:'AES-GCM',iv:fileIv},fileAesKey,buf),
+      crypto.subtle.exportKey('raw',fileAesKey)
     ]);
-  }).then(function(r) {
-    var fileCt = r[0];
-    rawFileKey = r[1];
+  }).then(function(r){
+    var fileCt=r[0],rawKey=r[1];
+    // Wrap file AES key with room key (simpler: encrypt rawKey with roomKey AES-GCM)
+    // Actually use ECDH-derived for file too: just encrypt with roomKey for group sharing
+    var wrapIv=crypto.getRandomValues(new Uint8Array(12));
     return Promise.all([
       Promise.resolve(fileCt),
-      crypto.subtle.encrypt({ name:'RSA-OAEP' }, peerRsaEncPub, rawFileKey),
-      crypto.subtle.sign({ name:'RSA-PSS', saltLength:32 }, myRsaSig.privateKey, fileCt)
+      crypto.subtle.encrypt({name:'AES-GCM',iv:wrapIv},roomKey,rawKey),
+      Promise.resolve(wrapIv),
+      crypto.subtle.sign({name:'RSA-PSS',saltLength:32},myRsaSig.privateKey,fileCt)
     ]);
-  }).then(function(r) {
-    var fileCt = r[0], wrappedKey = r[1], sig = r[2];
-    var body = {
-      roomId: S.roomId, filename: file.name,
-      mimeType: file.type || 'application/octet-stream',
-      size: file.size,
-      iv: ab2b64(fileIv.buffer),
-      ciphertext: ab2b64(fileCt),
-      wrappedKey: ab2b64(wrappedKey),
-      signature: ab2b64(sig),
-      senderName: S.myName
+  }).then(function(r){
+    var fileCt=r[0],wrappedKey=r[1],wrapIv=r[2],sig=r[3];
+    var body={
+      roomId:S.roomId,senderId:S.myId,senderName:S.myName,
+      filename:file.name,mimeType:file.type||'application/octet-stream',size:file.size,
+      iv:ab2b64(fileIv.buffer),ciphertext:ab2b64(fileCt),
+      wrappedKey:ab2b64(wrappedKey),wrapIv:ab2b64(wrapIv.buffer),
+      signature:ab2b64(sig)
     };
-    return fetch('/api/file', { method:'POST', body:JSON.stringify(body),
-      headers:{'Content-Type':'application/json'} });
-  }).then(function(res) { return res.json(); })
-  .then(function(json) {
-    if (json.fileId) {
-      S.sf++;
-      updateStats();
-      addFileBubble({ fileId:json.fileId, filename:file.name, mimeType:file.type, size:file.size, senderName:S.myName }, 'me');
+    return fetch('/api/file',{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'application/json'}});
+  }).then(function(res){return res.json();})
+  .then(function(json){
+    if(json.fileId){
+      S.sf++;updateStats();
+      addFileBubble({fileId:json.fileId,filename:file.name,mimeType:file.type,
+        size:file.size,senderName:S.myName,senderId:S.myId},'me');
       toast('✓ 送信完了');
-    } else {
-      toast('送信エラー: ' + (json.error || '不明'));
-    }
-  }).catch(function(e){ toast('エラー: ' + e.message); });
+    }else{toast('エラー: '+(json.error||'不明'));}
+  }).catch(function(e){toast('エラー: '+e.message);});
 };
 
-// ── FILE DOWNLOAD ──────────────────────────────────────────────────
-window.downloadFile = function(fileId, btn) {
-  btn.disabled = true;
-  btn.textContent = '取得中...';
-
-  fetch('/api/file/' + fileId)
-  .then(function(res) {
-    if (!res.ok) throw new Error('ファイルが見つかりません（期限切れかも）');
-    return res.json();
-  }).then(function(rec) {
-    btn.textContent = '復号中...';
-    return Promise.all([
-      Promise.resolve(rec),
-      crypto.subtle.decrypt({ name:'RSA-OAEP' }, myRsaEnc.privateKey, b642ab(rec.wrappedKey))
+window.downloadFile=function(fileId,btn){
+  btn.disabled=true;btn.textContent='取得中...';
+  fetch('/api/file/'+fileId)
+  .then(function(res){if(!res.ok)throw new Error('期限切れ');return res.json();})
+  .then(function(rec){
+    btn.textContent='復号中...';
+    var wrapIv=new Uint8Array(b642ab(rec.wrapIv));
+    return Promise.all([Promise.resolve(rec),
+      crypto.subtle.decrypt({name:'AES-GCM',iv:wrapIv},roomKey,b642ab(rec.wrappedKey))
     ]);
-  }).then(function(r) {
-    var rec = r[0], rawKey = r[1];
-    return Promise.all([
-      Promise.resolve(rec),
-      crypto.subtle.importKey('raw', rawKey, { name:'AES-GCM' }, false, ['decrypt'])
+  }).then(function(r){
+    var rec=r[0],rawKey=r[1];
+    return Promise.all([Promise.resolve(rec),
+      crypto.subtle.importKey('raw',rawKey,{name:'AES-GCM'},false,['decrypt'])
     ]);
-  }).then(function(r) {
-    var rec = r[0], fileAesKey = r[1];
-    var ct  = b642ab(rec.ciphertext);
-    var sig = b642ab(rec.signature);
-    var iv  = new Uint8Array(b642ab(rec.iv));
-    return Promise.all([
-      Promise.resolve(rec),
-      crypto.subtle.verify({ name:'RSA-PSS', saltLength:32 }, peerRsaSigPub, sig, ct).catch(function(){ return false; }),
-      crypto.subtle.decrypt({ name:'AES-GCM', iv:iv }, fileAesKey, ct)
-    ]);
-  }).then(function(r) {
-    var rec = r[0], sigOk = r[1], plain = r[2];
-    var url = URL.createObjectURL(new Blob([plain], { type: rec.mimeType }));
-    var a = document.createElement('a');
-    a.href = url; a.download = rec.filename; a.click();
+  }).then(function(r){
+    var rec=r[0],fk=r[1];
+    var iv=new Uint8Array(b642ab(rec.iv)),ct=b642ab(rec.ciphertext),sig=b642ab(rec.signature);
+    var peer=rec.senderId?peers.get(rec.senderId):null;
+    var vp=peer&&peer.rsaSigPub
+      ?crypto.subtle.verify({name:'RSA-PSS',saltLength:32},peer.rsaSigPub,sig,ct).catch(function(){return false;})
+      :Promise.resolve(null);
+    return Promise.all([Promise.resolve(rec),vp,crypto.subtle.decrypt({name:'AES-GCM',iv:iv},fk,ct)]);
+  }).then(function(r){
+    var rec=r[0],sigOk=r[1],plain=r[2];
+    var url=URL.createObjectURL(new Blob([plain],{type:rec.mimeType}));
+    var a=document.createElement('a');a.href=url;a.download=rec.filename;a.click();
     URL.revokeObjectURL(url);
-    S.rf++;
-    updateStats();
-    toast('✓ DL完了 — 署名: ' + (sigOk ? '正規' : '未確認'));
-    btn.textContent = '✓ 取得済み';
-  }).catch(function(e) {
-    toast('エラー: ' + e.message);
-    btn.disabled = false;
-    btn.textContent = '再試行';
-  });
+    S.rf++;updateStats();
+    toast('✓ DL完了'+(sigOk===true?' — 署名✓':sigOk===false?' — 署名未確認':''));
+    btn.textContent='✓ 済';
+  }).catch(function(e){toast('エラー: '+e.message);btn.disabled=false;btn.textContent='再試行';});
 };
 
-// ── UI HELPERS ─────────────────────────────────────────────────────
-function addTextBubble(o) {
-  var msgs = document.getElementById('msgs');
-  var es = document.getElementById('empty-state');
-  if (es) es.remove();
-  var id = 'bd' + (++msgN);
-  var time = o.ts.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
-  var row = document.createElement('div');
-  row.className = 'mrow ' + o.side;
-  row.innerHTML =
-    '<div class="bubble">' + esc(o.text) + '</div>' +
-    '<div class="mmeta">' +
-      '<span>' + time + '</span>' +
-      '<span style="color:var(--teal);opacity:.7">AES-GCM</span>' +
-      '<span class="' + (o.sigOk ? 'sok' : 'sng') + '">' + (o.sigOk ? '&#10003; RSA-PSS' : '&#10007; 署名NG') + '</span>' +
-      '<button class="dbtn" onclick="toggleD(\'' + id + '\')">詳細</button>' +
-    '</div>' +
-    '<div class="dbox" id="' + id + '">' +
-      '<div class="dl">IV (96 bit)</div>' + esc(o.ivHex) +
-      '<div class="dl">暗号文 hex (先頭)</div>' + esc(o.ctHex.slice(0,96)) + '...' +
-      '<div class="dl">RSA-PSS 署名 hex (先頭)</div>' + esc(o.sigHex.slice(0,64)) + '...' +
-      '<div class="dl">署名検証</div>' + (o.sigOk ? '&#10003; 正規の送信者' : '&#10007; 検証失敗') +
-    '</div>';
-  msgs.appendChild(row);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function addFileBubble(o, side) {
-  var msgs = document.getElementById('msgs');
-  var es = document.getElementById('empty-state');
-  if (es) es.remove();
-  var ext = (o.filename || '').split('.').pop().toUpperCase();
-  var icons = {PDF:'&#128196;',PNG:'&#128444;',JPG:'&#128444;',JPEG:'&#128444;',
-    GIF:'&#128444;',MP4:'&#127916;',MP3:'&#127925;',ZIP:'&#128230;',TXT:'&#128196;'};
-  var icon = icons[ext] || '&#128206;';
-  var row = document.createElement('div');
-  row.className = 'mrow ' + side;
-  var btn = side === 'peer'
-    ? '<button class="fdlbtn" id="fb' + (++msgN) + '" onclick="downloadFile(\'' + o.fileId + '\',this)">&#8595; DL</button>'
-    : '<span style="font-family:var(--mono);font-size:10px;color:var(--teal)">&#10003; 送信済</span>';
-  row.innerHTML =
-    '<div class="fbubble">' +
-      '<div class="ficon">' + icon + '</div>' +
-      '<div class="finfo">' +
-        '<div class="fname" title="' + esc(o.filename||'') + '">' + esc(o.filename||'ファイル') + '</div>' +
-        '<div class="fmeta">' + fmtSize(o.size||0) + ' &middot; ' + esc(ext) + '</div>' +
-        '<div class="fmeta" style="color:var(--teal);margin-top:2px">&#128274; AES-256-GCM &middot; RSA-OAEP &middot; RSA-PSS</div>' +
-      '</div>' + btn +
-    '</div>';
-  msgs.appendChild(row);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function sysmsg(t) {
-  var msgs = document.getElementById('msgs');
-  var es = document.getElementById('empty-state');
-  if (es) es.remove();
-  var el = document.createElement('div');
-  el.className = 'mrow sys';
-  el.innerHTML = '<div class="bubble">' + t + '</div>';
-  msgs.appendChild(el);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-window.toggleD = function(id) {
-  document.getElementById(id).classList.toggle('open');
-};
-
-function enableChat() {
-  document.getElementById('p-name').textContent = S.peerName || '相手';
-  document.getElementById('p-sub').textContent  = S.roomId + ' · E2E暗号化';
-  document.getElementById('p-ava').textContent  = (S.peerName || '?')[0].toUpperCase();
-  document.getElementById('e2e-pill').style.display = 'flex';
-  document.getElementById('hbar-enc').textContent = '&#128274; E2E暗号化中';
-  document.getElementById('hbar-enc').classList.add('on');
-  document.getElementById('room-display').textContent = S.roomId;
-  document.getElementById('leave-wrap').style.display = 'block';
-  document.getElementById('chips').innerHTML =
-    '<span class="chip ct">ECDHE P-256</span>' +
-    '<span class="chip cb">DH 鍵交換</span>' +
-    '<span class="chip ca">RSA-OAEP</span>' +
-    '<span class="chip cp">RSA-PSS</span>' +
-    '<span class="chip ct">AES-256-GCM</span>';
-  document.getElementById('mi').disabled       = false;
-  document.getElementById('send-btn').disabled = false;
-  document.getElementById('file-btn').disabled = false;
-  document.getElementById('mi').focus();
-  setHStatus('live', '接続中');
-  sysmsg('&#128272; ' + (S.peerName||'相手') + ' と暗号化チャンネルを確立しました');
+// ── UI ─────────────────────────────────────────────────────────────
+function setupUI(){
+  document.getElementById('room-title').textContent=S.roomId;
+  document.getElementById('room-sub').textContent='1人で待機中...';
+  document.getElementById('room-disp').textContent=S.roomId;
+  document.getElementById('leave-wrap').style.display='block';
+  document.getElementById('wait-pill').style.display='flex';
+  document.getElementById('e2e-pill').style.display='none';
+  setHStatus('live','接続中');
+  addMySelf();
+  updateMembersList();
   updateStats();
 }
 
-function disableInput() {
-  document.getElementById('mi').disabled       = true;
-  document.getElementById('send-btn').disabled = true;
-  document.getElementById('file-btn').disabled = true;
+function activateChat(){
+  var n=peers.size+1;
+  document.getElementById('room-sub').textContent=S.roomId+' · '+n+'人 · E2E暗号化';
+  document.getElementById('wait-pill').style.display='none';
+  document.getElementById('e2e-pill').style.display='flex';
+  document.getElementById('hbar-enc').textContent='&#128274; E2E暗号化中';
+  document.getElementById('hbar-enc').classList.add('on');
+  document.getElementById('chips').innerHTML=
+    '<span class="chip ct">ECDHE</span><span class="chip cb">DH</span>'+
+    '<span class="chip ca">RSA-OAEP</span><span class="chip cp">RSA-PSS</span>'+
+    '<span class="chip ct">AES-256-GCM</span>';
+  document.getElementById('mi').disabled=false;
+  document.getElementById('send-btn').disabled=false;
+  document.getElementById('file-btn').disabled=false;
+  document.getElementById('mi').focus();
+  var es=document.getElementById('empty-state');if(es)es.remove();
+  sysmsg('&#128272; 暗号化チャンネルが確立されました ('+(peers.size+1)+'人)');
 }
 
-function setHStatus(cls, label) {
-  document.getElementById('h-dot').className      = 'sdot ' + cls;
-  document.getElementById('h-lbl').textContent    = label;
+function addMySelf(){
+  // Add self to peers display (not in peers map, handled separately in render)
+  updateMembersList();
 }
 
-function setCard(id, text) {
-  var card = document.getElementById('card-' + id);
-  var ck   = document.getElementById('ck-' + id);
-  var val  = document.getElementById('v-' + id);
-  if (card) card.classList.add('ok');
-  if (ck)   { ck.className = 'cchk ok'; ck.textContent = '✓'; }
-  if (val)  val.textContent = text;
+function updateMembersList(){
+  var list=document.getElementById('members-list');
+  list.innerHTML='';
+  // Self
+  var selfEl=document.createElement('div');
+  selfEl.className='member-row me';
+  selfEl.innerHTML='<div class="member-ava av0">'+esc((S.myName||'?')[0].toUpperCase())+'</div>'+
+    '<div class="member-info"><div class="member-name">'+esc(S.myName)+'</div>'+
+    '<div class="member-sub">あなた</div></div>'+
+    '<div class="member-dot"></div>';
+  list.appendChild(selfEl);
+  // Others
+  peers.forEach(function(p,id){
+    var el=document.createElement('div');
+    el.className='member-row';
+    var ready=p.rsaEncPub&&p.rsaSigPub;
+    el.innerHTML='<div class="member-ava '+(p.color||'av1')+'">'+esc((p.name||'?')[0].toUpperCase())+'</div>'+
+      '<div class="member-info"><div class="member-name">'+esc(p.name||'?')+'</div>'+
+      '<div class="member-sub">'+(ready?'&#10003; 鍵交換済':'鍵交換中...')+'</div></div>'+
+      '<div class="member-dot" style="background:'+(ready?'var(--teal)':'var(--amber)')+'"></div>';
+    list.appendChild(el);
+  });
+  var total=peers.size+1;
+  document.getElementById('member-count').textContent='('+total+'人)';
+  document.getElementById('st-p').textContent=total;
+  if(total>1){
+    document.getElementById('room-sub').textContent=S.roomId+' · '+total+'人'+(roomKey?' · E2E暗号化':'');
+  }
 }
 
-function updateStats() {
-  document.getElementById('st-s').textContent  = S.sm;
-  document.getElementById('st-r').textContent  = S.rm;
-  document.getElementById('st-fs').textContent = S.sf;
-  document.getElementById('st-fr').textContent = S.rf;
+function addTextBubble(o){
+  var msgs=document.getElementById('msgs');
+  var es=document.getElementById('empty-state');if(es)es.remove();
+  var id='bd'+(++msgN);
+  var isMe=o.fromId===S.myId||o.side==='me';
+  var time=o.ts.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  var row=document.createElement('div');
+  row.className='mrow '+(isMe?'me':'other');
+  var senderLabel=isMe?'':('<div class="msender">'+esc(o.fromName||'?')+'</div>');
+  row.innerHTML=senderLabel+
+    '<div class="bubble">'+esc(o.text)+'</div>'+
+    '<div class="mmeta">'+
+      '<span>'+time+'</span>'+
+      '<span style="color:var(--teal);opacity:.7">AES-GCM</span>'+
+      (o.sigOk===true?'<span class="sok">&#10003; RSA-PSS</span>':
+       o.sigOk===false?'<span class="sng">&#10007; 署名NG</span>':
+       '<span style="color:var(--muted)">署名不明</span>')+
+      (o.ivHex?'<button class="dbtn" onclick="toggleD(\''+id+'\')">詳細</button>':'')+
+    '</div>'+
+    (o.ivHex?'<div class="dbox" id="'+id+'">'+
+      '<div class="dl">IV</div>'+esc(o.ivHex)+
+      '<div class="dl">暗号文(先頭)</div>'+esc(o.ctHex.slice(0,80))+'...'+
+      '<div class="dl">RSA-PSS署名(先頭)</div>'+esc(o.sigHex.slice(0,60))+'...'+
+    '</div>':'');
+  msgs.appendChild(row);
+  msgs.scrollTop=msgs.scrollHeight;
 }
 
-window.doLeave  = function() { location.reload(); };
-window.onKey    = function(e) { if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); doSend(); } };
-window.autoH    = function(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; };
+function addFileBubble(o,side){
+  var msgs=document.getElementById('msgs');
+  var es=document.getElementById('empty-state');if(es)es.remove();
+  var isMe=o.senderId===S.myId||side==='me';
+  var ext=(o.filename||'').split('.').pop().toUpperCase();
+  var icons={PDF:'&#128196;',PNG:'&#128444;',JPG:'&#128444;',JPEG:'&#128444;',
+    GIF:'&#128444;',MP4:'&#127916;',MP3:'&#127925;',ZIP:'&#128230;',TXT:'&#128196;'};
+  var icon=icons[ext]||'&#128206;';
+  var row=document.createElement('div');
+  row.className='mrow '+(isMe?'me':'other');
+  var senderLabel=isMe?'':('<div class="msender">'+esc(o.senderName||'?')+'</div>');
+  var btn=(!isMe)
+    ?'<button class="fdlbtn" onclick="downloadFile(\''+esc(o.fileId)+'\',this)">&#8595; DL</button>'
+    :'<span style="font-family:var(--mono);font-size:10px;color:var(--teal)">&#10003;</span>';
+  row.innerHTML=senderLabel+
+    '<div class="fbubble"><div class="ficon">'+icon+'</div>'+
+    '<div class="finfo"><div class="fname">'+esc(o.filename||'ファイル')+'</div>'+
+    '<div class="fmeta">'+fmtSize(o.size||0)+' &middot; '+esc(ext)+'</div>'+
+    '<div class="fmeta" style="color:var(--teal);margin-top:2px">&#128274; AES-GCM+RSA-OAEP</div></div>'+btn+'</div>';
+  msgs.appendChild(row);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function sysmsg(t){
+  var msgs=document.getElementById('msgs');
+  var es=document.getElementById('empty-state');if(es)es.remove();
+  var el=document.createElement('div');el.className='mrow sys';
+  el.innerHTML='<div class="bubble">'+t+'</div>';
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+}
+
+window.toggleD=function(id){document.getElementById(id).classList.toggle('open');};
+
+function disableInput(){
+  document.getElementById('mi').disabled=true;
+  document.getElementById('send-btn').disabled=true;
+  document.getElementById('file-btn').disabled=true;
+}
+function setHStatus(cls,label){
+  document.getElementById('h-dot').className='sdot '+cls;
+  document.getElementById('h-lbl').textContent=label;
+}
+function setCard(id,text){
+  var c=document.getElementById('card-'+id);var k=document.getElementById('ck-'+id);var v=document.getElementById('v-'+id);
+  if(c)c.classList.add('ok');if(k){k.className='cchk ok';k.textContent='✓';}if(v)v.textContent=text;
+}
+function updateStats(){
+  document.getElementById('st-s').textContent=S.sm;
+  document.getElementById('st-r').textContent=S.rm;
+  document.getElementById('st-f').textContent=S.sf+S.rf;
+  document.getElementById('st-p').textContent=peers.size+1;
+}
+window.doLeave=function(){location.reload();};
+window.onKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}};
+window.autoH=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
 
 })();
 </script>
